@@ -1,0 +1,507 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#151b23">
+<title>MEU PREGADOR</title>
+<style>
+:root{
+--bg:#111820;--surface:#1b2530;--surface2:#263341;
+--gold:#d7b36c;--cream:#f4ead7;--muted:#aab3bd;
+--line:#394653;--green:#789a80;--red:#a85b5b;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--cream);font-family:Georgia,serif}
+header{background:#18212b;border-bottom:2px solid var(--gold);padding:17px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}
+.logo{font-size:22px;color:var(--gold);letter-spacing:2px;font-weight:bold}
+.logo small{display:block;font-size:9px;color:var(--muted);letter-spacing:3px}
+button{border:0;border-radius:5px;padding:11px 15px;background:var(--gold);color:#18212b;font-weight:bold;font-family:inherit;cursor:pointer}
+button.secondary{background:var(--surface2);color:var(--cream);border:1px solid var(--line)}
+button.danger{background:#743c3c;color:white}
+button:disabled{opacity:.5;cursor:not-allowed}
+nav{display:flex;gap:7px;padding:12px;overflow-x:auto;background:#18212b;border-bottom:1px solid var(--line)}
+nav button{white-space:nowrap}
+nav button.active{background:var(--gold);color:#17202a}
+main{max-width:1050px;margin:auto;padding:20px 15px 80px}
+h1,h2,h3{color:var(--gold)}
+h1{font-size:29px}
+p{line-height:1.6}
+.muted{color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:19px;margin:14px 0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+input,textarea,select{width:100%;background:#101820;color:var(--cream);border:1px solid #465463;border-radius:5px;padding:12px;font:15px Georgia;margin:7px 0 15px}
+textarea{min-height:120px;resize:vertical;line-height:1.6}
+label{color:var(--gold);font-size:14px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.card{background:var(--surface2);border:1px solid var(--line);padding:15px;border-radius:7px;margin:10px 0}
+.steps{display:flex;gap:6px;overflow-x:auto;padding:10px 0}
+.steps button{font-size:12px;white-space:nowrap;padding:9px}
+.steps button.active{background:var(--green);color:white}
+.hidden{display:none!important}
+.small{font-size:12px;color:var(--muted)}
+.item{display:flex;justify-content:space-between;align-items:center;gap:10px}
+a{color:var(--gold)}
+#answer,#researchResults{white-space:pre-wrap;line-height:1.7}
+.result{border-bottom:1px solid var(--line);padding:12px 0}
+footer{text-align:center;color:var(--muted);padding:25px;font-size:12px}
+.status{padding:12px;border-radius:5px;background:#263341;margin:12px 0;white-space:pre-wrap}
+@media(max-width:600px){
+header{padding:13px}.logo{font-size:18px}
+main{padding:12px 10px 60px}
+.grid{grid-template-columns:1fr}.panel{padding:14px}
+h1{font-size:24px}button{padding:11px}
+}
+@media print{
+body{background:white;color:black}
+header,nav,footer,.no-print{display:none!important}
+main{padding:0}.panel,.card{background:white;color:black;border:0}
+h1,h2,h3,label{color:#222}
+}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="logo">✦ MEU PREGADOR
+ <small>ESTUDO • PALAVRA • PREGAÇÃO</small></div>
+ <span class="small">✝ HOMILÉTICA</span>
+</header>
+
+<nav>
+ <button class="active" data-page="home" onclick="show('home',this)">Início</button>
+ <button onclick="newSermon()">Nova pregação</button>
+ <button data-page="library" onclick="show('library',this)">Biblioteca</button>
+ <button data-page="research" onclick="show('research',this)">Pesquisa bíblica</button>
+ <button data-page="materials" onclick="show('materials',this)">Materiais</button>
+ <button data-page="settings" onclick="show('settings',this)">Configurações</button>
+</nav>
+
+<main>
+<section id="home">
+ <h1>Bem-vindo, pregador!</h1>
+ <p class="muted">Prepare mensagens bíblicas com profundidade, clareza e fidelidade às Escrituras.</p>
+ <div class="panel">
+  <h2>Prepare sua próxima mensagem</h2>
+  <p>Da escolha do texto bíblico ao apelo final.</p>
+  <button onclick="newSermon()">＋ COMEÇAR NOVA PREGAÇÃO</button>
+ </div>
+ <div class="grid">
+  <div class="card"><h3>📖 Estudo bíblico</h3><p>Contexto histórico, cultural, literário e teológico.</p></div>
+  <div class="card"><h3>✍️ Método REDAN</h3><p>Introduções conectadas às necessidades humanas.</p></div>
+  <div class="card"><h3>🎓 Professor de homilética</h3><p>Orientação e revisão das mensagens com IA.</p></div>
+  <div class="card"><h3>📚 Biblioteca</h3><p>Organize seus sermões e materiais de estudo.</p></div>
+ </div>
+ <p id="status" class="small">Salvamento local disponível.</p>
+</section>
+
+<section id="editor" class="hidden">
+ <h1>Construção da pregação</h1>
+ <div class="panel">
+  <label>Título</label>
+  <input id="title" placeholder="Título da mensagem">
+  <div class="grid">
+   <div><label>Texto bíblico</label><input id="reference" placeholder="Ex.: Gênesis 50:20"></div>
+   <div><label>Ocasião</label>
+    <select id="occasion">
+     <option>Culto</option><option>Congresso</option>
+     <option>Culto da família</option><option>Evangelismo</option>
+     <option>Oração</option><option>Jovens</option>
+     <option>Estudo bíblico</option><option>Outro</option>
+    </select>
+   </div>
+  </div>
+  <label>Texto bíblico (cole os versículos)</label>
+  <textarea id="bible" placeholder="Cole a passagem bíblica aqui..."></textarea>
+  <label>Assunto central</label>
+  <input id="subject" placeholder="Qual é a mensagem principal?">
+  <label>Objetivo da pregação</label>
+  <textarea id="objective" placeholder="O que deseja ensinar à igreja?"></textarea>
+  <div class="actions">
+   <button onclick="generate()">✦ GERAR ESTRUTURA COMPLETA</button>
+   <button class="secondary" onclick="save()">Salvar</button>
+  </div>
+ </div>
+
+ <div class="steps" id="steps"></div>
+ <div class="panel">
+  <div class="item">
+   <h2 id="stepTitle">Introdução REDAN</h2>
+   <span id="stepNumber" class="small"></span>
+  </div>
+  <p id="stepHelp" class="muted"></p>
+  <label>Desenvolvimento da etapa</label>
+  <textarea id="content" style="min-height:280px" placeholder="Desenvolva sua pregação aqui..."></textarea>
+  <div class="actions">
+   <button class="secondary" onclick="previous()">← Anterior</button>
+   <button onclick="next()">Próxima →</button>
+   <button class="secondary" onclick="save()">Salvar etapa</button>
+  </div>
+ </div>
+
+ <div class="panel">
+  <h2>✦ Professor de Homilética IA</h2>
+  <p class="muted">Peça explicações, correções, pesquisa, aprofundamento e sugestões.</p>
+  <textarea id="question" placeholder="Ex.: Analise esta passagem pelo contexto histórico e teológico..."></textarea>
+  <button id="aiButton" onclick="askAI()">Consultar inteligência artificial</button>
+  <div id="answer"></div>
+ </div>
+ <div class="actions no-print">
+  <button onclick="save()">Salvar pregação</button>
+  <button onclick="pdf()">Gerar PDF</button>
+ </div>
+</section>
+
+<section id="library" class="hidden">
+ <h1>Minha biblioteca</h1>
+ <p class="muted">Suas mensagens salvas neste dispositivo.</p>
+ <div id="sermonList"></div>
+</section>
+
+<section id="research" class="hidden">
+ <h1>Pesquisa bíblica</h1>
+ <div class="panel">
+  <label>Assunto, passagem ou palavra</label>
+  <input id="search" placeholder="Ex.: Contexto de Gênesis 50:20">
+  <div class="actions">
+   <button onclick="searchWeb()">Pesquisar na internet</button>
+   <button class="secondary" onclick="searchBible()">Pesquisar na Bíblia</button>
+   <button class="secondary" onclick="researchAI()">Analisar com IA</button>
+  </div>
+  <p class="small">A pesquisa externa abre fontes em outra página. A análise com IA depende da configuração do servidor.</p>
+  <div id="researchResults"></div>
+ </div>
+ <div class="panel">
+  <h3>Fontes de estudo</h3>
+  <p><a href="https://biblehub.com/" target="_blank" rel="noopener">Bible Hub — comentários bíblicos</a></p>
+  <p><a href="https://www.stepbible.org/" target="_blank" rel="noopener">STEP Bible — línguas originais</a></p>
+  <p><a href="https://www.biblegateway.com/" target="_blank" rel="noopener">Bible Gateway — textos bíblicos</a></p>
+ </div>
+</section>
+
+<section id="materials" class="hidden">
+ <h1>Materiais de referência</h1>
+ <p class="muted">Registre suas fontes de estudo e consulte suas anotações.</p>
+ <div class="panel">
+  <label>Nome do material</label>
+  <input id="matTitle" placeholder="Ex.: Deus Está no Controle — Max Lucado">
+  <label>Autor</label>
+  <input id="matAuthor" placeholder="Nome do autor">
+  <label>Conteúdo ou anotação de estudo</label>
+  <textarea id="matContent" placeholder="Registre suas anotações, páginas e referências..."></textarea>
+  <button onclick="addMaterial()">Adicionar material</button>
+ </div>
+ <div id="materialList"></div>
+ <div class="panel">
+  <h3>Metodologias incorporadas</h3>
+  <p>• Método REDAN.</p>
+  <p>• Introdução em três movimentos.</p>
+  <p>• Contextualização histórica, cultural, literária e teológica.</p>
+  <p>• Exegese e análise das referências cruzadas.</p>
+  <p>• Aplicação fundamentada no texto bíblico.</p>
+  <p>• Conclusão e apelo pastoral.</p>
+ </div>
+</section>
+
+<section id="settings" class="hidden">
+ <h1>Configurações</h1>
+ <div class="panel">
+  <h2>Integração da inteligência artificial</h2>
+  <p>Informe o endereço de um servidor próprio que se conecte à IA.</p>
+  <label>Endereço do servidor de IA</label>
+  <input id="endpoint" placeholder="https://seuservidor.com/api/pregador">
+  <button onclick="saveEndpoint()">Salvar conexão</button>
+  <p class="small">O servidor precisa aceitar POST com { "prompt": "..." } e responder JSON com { "reply": "..." }. A chave da API deve ficar protegida no servidor, nunca neste HTML.</p>
+ </div>
+ <div class="panel">
+  <h2>Backup</h2>
+  <button onclick="backup()">Exportar dados</button>
+  <label>Restaurar backup JSON</label>
+  <input type="file" id="restoreFile" accept=".json">
+  <button onclick="restore()">Restaurar dados</button>
+ </div>
+</section>
+</main>
+<footer>MEU PREGADOR • A Palavra de Deus como fundamento</footer>
+
+<script>
+"use strict";
+
+const stages=[
+ {name:"Introdução REDAN",help:"Representação, Dor, Anseios e Necessidade humana. Desenvolva a pergunta inicial, a ancoragem na realidade e a conexão bíblica."},
+ {name:"Contexto bíblico",help:"Investigue as dimensões histórica, política, cultural, literária e teológica. Identifique fontes e diferencie fatos de hipóteses."},
+ {name:"Exegese do texto",help:"Examine o recorte, a sequência dos versículos, palavras importantes, cenário, personagens e intenção do autor."},
+ {name:"Análise teológica",help:"Observe a mensagem central, referências cruzadas e a relação com o restante das Escrituras."},
+ {name:"Tópicos expositivos",help:"Construa divisões que nasçam da passagem, com títulos, versículos, explicações e referências complementares."},
+ {name:"Aplicação",help:"O que ensina? O que revela sobre Deus? O que confronta? Como viver hoje?"},
+ {name:"Conclusão",help:"Retome o tema, reúna os ensinamentos e mostre a mensagem central da passagem."},
+ {name:"Apelo",help:"Convite bíblico, evangelístico e pastoral, coerente com o texto estudado."},
+ {name:"Revisão homilética",help:"Verifique fidelidade bíblica, coerência, repetições, transições, aplicações e clareza."}
+];
+
+let sermon=null,stage=0,sermons=[],materials=[];
+const $=id=>document.getElementById(id);
+const fields=["title","reference","occasion","bible","subject","objective"];
+
+function read(key,def){
+ try{return JSON.parse(localStorage.getItem(key))||def}
+ catch(e){return def}
+}
+function persist(){
+ try{
+  localStorage.setItem("mp_sermons",JSON.stringify(sermons));
+  localStorage.setItem("mp_materials",JSON.stringify(materials));
+ }catch(e){alert("Não foi possível salvar. Verifique o espaço disponível no navegador.");}
+}
+function init(){
+ sermons=read("mp_sermons",[]);
+ materials=read("mp_materials",[]);
+ $("endpoint").value=localStorage.getItem("mp_endpoint")||"";
+ renderMaterials();
+}
+function show(id,btn){
+ document.querySelectorAll("main section").forEach(s=>s.classList.add("hidden"));
+ $(id).classList.remove("hidden");
+ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+ const target=btn||document.querySelector('nav button[data-page="'+id+'"]');
+ if(target)target.classList.add("active");
+ if(id==="library")renderLibrary();
+ if(id==="materials")renderMaterials();
+}
+function newSermon(){
+ sermon={id:Date.now(),parts:Array(9).fill("")};
+ fields.forEach(f=>sermon[f]="");
+ stage=0;
+ fill();
+ renderStage();
+ $("answer").textContent="";
+ $("question").value="";
+ show("editor");
+}
+function fill(){
+ fields.forEach(f=>$(f).value=sermon[f]||"");
+}
+function collect(){
+ if(!sermon)return;
+ fields.forEach(f=>sermon[f]=$(f).value);
+ sermon.parts[stage]=$("content").value;
+}
+function renderStage(){
+ $("steps").innerHTML="";
+ stages.forEach((s,i)=>{
+  const b=document.createElement("button");
+  b.textContent=(i+1)+". "+s.name;
+  b.className=i===stage?"active":"secondary";
+  b.onclick=()=>{
+   collect();
+   stage=i;
+   renderStage();
+  };
+  $("steps").appendChild(b);
+ });
+ $("stepTitle").textContent=stages[stage].name;
+ $("stepNumber").textContent=(stage+1)+" / "+stages.length;
+ $("stepHelp").textContent=stages[stage].help;
+ $("content").value=sermon.parts[stage]||"";
+}
+function next(){
+ collect();
+ if(stage<stages.length-1)stage++;
+ renderStage();
+ save(false);
+}
+function previous(){
+ collect();
+ if(stage>0)stage--;
+ renderStage();
+}
+function generate(){
+ collect();
+ const r=sermon.reference||"passagem escolhida";
+ const subject=sermon.subject||"a mensagem central";
+ sermon.parts=[
+ `PERGUNTA: O que esta passagem nos ensina diante da realidade que vivemos?
+
+REPRESENTAÇÃO: Apresente uma situação cotidiana que ilustre o tema.
+
+DOR: Identifique a necessidade humana presente na passagem.
+
+ANSEIOS: Quais são as expectativas e buscas humanas relacionadas ao texto?
+
+NECESSIDADE: Qual necessidade espiritual a passagem revela?
+
+ANCORAGEM: Conecte a realidade do ouvinte à passagem.
+
+TEMA: ${subject}.
+
+TEXTO: ${r}.`,
+ `HISTÓRICO: Investigue época, autoria, destinatários e situação histórica.
+
+POLÍTICO: Analise o cenário de governo e poder.
+
+CULTURAL: Investigue costumes e tradições.
+
+LITERÁRIO: Identifique gênero, estrutura, personagens e cenário.
+
+TEOLÓGICO: Identifique o que a passagem revela sobre Deus.
+
+FONTES: Registre as obras e referências efetivamente consultadas.`,
+ `1. Leia a passagem em sua totalidade.
+2. Examine cada versículo em sequência.
+3. Identifique palavras e expressões importantes.
+4. Observe o contexto imediato e o contexto do livro.
+5. Investigue o sentido original quando necessário.
+6. Diferencie o texto da interpretação pessoal.`,
+ `MENSAGEM CENTRAL: Identifique a verdade principal.
+
+REFERÊNCIAS CRUZADAS: Compare passagens relacionadas.
+
+RELAÇÃO COM AS ESCRITURAS: Observe como o tema se conecta com o restante da Bíblia.
+
+Não imponha ao texto uma interpretação que seu contexto não sustenta.`,
+ `TÓPICO 1 — Primeira verdade revelada pela passagem.
+Versículos:
+Explicação:
+Referências:
+
+TÓPICO 2 — Segunda verdade revelada pela passagem.
+Versículos:
+Explicação:
+Referências:
+
+TÓPICO 3 — Resposta exigida pelo texto.
+Versículos:
+Explicação:
+Referências:`,
+ `PARA CADA TÓPICO:
+
+O que o texto ensina?
+O que revela sobre Deus?
+Qual realidade humana confronta?
+Como viver essa verdade hoje?
+Qual resposta o ouvinte deve dar?
+
+As aplicações devem nascer do próprio texto.`,
+ `Retome o tema e a mensagem central de ${r}.
+
+Reúna os ensinamentos principais e mostre o propósito da passagem. Conduza os ouvintes à reflexão.`,
+ `Prepare um convite pastoral coerente com a mensagem. Convide à fé, arrependimento, obediência ou esperança, conforme o texto bíblico.`,
+ `CHECKLIST:
+[ ] Introdução conectada ao texto.
+[ ] REDAN desenvolvido.
+[ ] Contexto histórico pesquisado.
+[ ] Contexto cultural pesquisado.
+[ ] Contexto literário analisado.
+[ ] Contexto teológico explicado.
+[ ] Exegese respeita o contexto.
+[ ] Tópicos fundamentados nos versículos.
+[ ] Aplicações fundamentadas.
+[ ] Conclusão coerente.
+[ ] Apelo bíblico e pastoral.
+[ ] Fontes identificadas.`
+ ];
+ stage=0;
+ renderStage();
+ save(false);
+ alert("Estrutura criada! Agora desenvolva e confira cada etapa com atenção ao texto bíblico.");
+}
+function save(showMessage=true){
+ if(!sermon)return;
+ collect();
+ if(!sermon.title)sermon.title="Pregação sem título";
+ const i=sermons.findIndex(s=>s.id===sermon.id);
+ if(i<0)sermons.unshift({...sermon});
+ else sermons[i]={...sermon};
+ persist();
+ if(showMessage)$("status").textContent="Pregação salva neste dispositivo.";
+}
+function renderLibrary(){
+ $("sermonList").innerHTML="";
+ if(!sermons.length){
+  $("sermonList").textContent="Nenhuma pregação salva.";
+  return;
+ }
+ sermons.forEach(s=>{
+  const box=document.createElement("div");
+  box.className="card";
+  const h=document.createElement("h3");
+  h.textContent=s.title;
+  const p=document.createElement("p");
+  p.textContent=(s.reference||"Sem referência")+" • "+(s.occasion||"");
+  const actions=document.createElement("div");
+  actions.className="actions";
+  const add=(txt,fn,cls="secondary")=>{
+   const b=document.createElement("button");
+   b.textContent=txt;
+   b.className=cls;
+   b.onclick=fn;
+   actions.appendChild(b);
+  };
+  add("Abrir",()=>{
+   sermon=JSON.parse(JSON.stringify(s));
+   stage=0;fill();renderStage();show("editor");
+  });
+  add("Duplicar",()=>{
+   const c=JSON.parse(JSON.stringify(s));
+   c.id=Date.now();c.title+=" (cópia)";
+   sermons.unshift(c);persist();renderLibrary();
+  });
+  add("PDF",()=>{
+   sermon=JSON.parse(JSON.stringify(s));
+   stage=0;fill();renderStage();show("editor");pdf();
+  });
+  add("Excluir",()=>{
+   if(confirm("Excluir esta pregação?")){
+    sermons=sermons.filter(x=>x.id!==s.id);
+    persist();renderLibrary();
+   }
+  },"danger");
+  box.append(h,p,actions);
+  $("sermonList").appendChild(box);
+ });
+}
+function pdf(){
+ if(!sermon)return;
+ collect();
+ const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+ const body=stages.map((s,i)=>"<h2>"+esc(s.name)+"</h2><p>"+esc(sermon.parts[i]).replace(/\n/g,"<br>")+"</p>").join("");
+ const w=window.open("","_blank");
+ if(!w){alert("Permita janelas pop-up para gerar o PDF.");return;}
+ w.document.write("<html><head><title>"+esc(sermon.title)+"</title><style>body{font:16px Georgia;max-width:800px;margin:35px auto;line-height:1.7;color:#222}h1,h2{color:#755b2b}h2{margin-top:30px}@media print{body{margin:15mm}}</style></head><body><h1>"+esc(sermon.title)+"</h1><p><b>Texto:</b> "+esc(sermon.reference)+"</p><p><b>Ocasião:</b> "+esc(sermon.occasion)+"</p><p><b>Assunto:</b> "+esc(sermon.subject)+"</p>"+body+"</body></html>");
+ w.document.close();
+ w.focus();
+ setTimeout(()=>w.print(),500);
+}
+function openSearch(url){
+ const w=window.open(url,"_blank");
+ if(!w)alert("O navegador bloqueou a janela. Permita pop-ups para este aplicativo.");
+}
+function searchWeb(){
+ const q=$("search").value.trim();
+ if(!q)return alert("Digite o que deseja pesquisar.");
+ openSearch("https://www.google.com/search?q="+encodeURIComponent(q+" estudo bíblico comentários contexto"));
+}
+function searchBible(){
+ const q=$("search").value.trim();
+ if(!q)return alert("Digite uma passagem ou palavra.");
+ openSearch("https://www.biblegateway.com/quicksearch/?quicksearch="+encodeURIComponent(q)+"&version=ARC");
+}
+function addMaterial(){
+ const title=$("matTitle").value.trim();
+ if(!title)return alert("Informe o nome do material.");
+ materials.unshift({
+  id:Date.now(),title,
+  author:$("matAuthor").value,
+  content:$("matContent").value
+ });
+ persist();renderMaterials();
+ ["matTitle","matAuthor","matContent"].forEach(x=>$(x).value="");
+}
+function renderMaterials(){
+ $("materialList").innerHTML="";
+ materials.forEach(m=>{
+  const d=document.createElement("div");d.className="card";
+  const h=document.createElement("h3");h.textContent=m.title;
+  const p=document.createElement("p");p.textContent=m.author||"Autor não informado";
+  const c=document.createElement("p");c.t
